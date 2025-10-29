@@ -97,7 +97,7 @@ export default function SettingsPage() {
             if (response.data && response.data.message) {
                 toast.success(response.data.message);
                 setTimeout(async () => {
-                    await base44.auth.logout();
+                    await emergentAPI.auth.logout();
                     window.location.href = '/';
                 }, 2000);
             }
