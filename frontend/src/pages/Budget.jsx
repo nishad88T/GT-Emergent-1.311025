@@ -142,11 +142,11 @@ function Budget() {
 
                 <TabsContent value="current" className="space-y-6">
                     {currentBudget && budgetStatus ? (
-                        <CurrentBudgetStatus 
-                            budget={currentBudget} 
-                            status={budgetStatus}
-                            onUpdate={loadData}
-                        />
+                        <Card>
+                            <CardContent className="pt-6">
+                                <p className="text-gray-600">Budget status display coming soon...</p>
+                            </CardContent>
+                        </Card>
                     ) : (
                         <Card>
                             <CardContent className="pt-6">
