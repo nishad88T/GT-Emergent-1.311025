@@ -45,7 +45,7 @@ export default function SettingsPage() {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const currentUser = await base44.auth.me();
+                const currentUser = await emergentAPI.auth.me();
                 setUser(currentUser);
                 setCurrency(currentUser.currency || 'GBP');
                 setWeekStartsOn(currentUser.week_starts_on ?? 1); // Set from user data, default to Monday
