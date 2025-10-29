@@ -5,9 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Calendar, Target } from "lucide-react";
-import BudgetSetup from "../components/budget/BudgetSetup";
-import BudgetHistory from "../components/budget/BudgetHistory";
-import CurrentBudgetStatus from "../components/budget/CurrentBudgetStatus";
 import emergentAPI from "@/api/emergentClient";
 
 function Budget() {
