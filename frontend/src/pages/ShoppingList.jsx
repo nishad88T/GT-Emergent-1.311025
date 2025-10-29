@@ -57,7 +57,7 @@ function ShoppingList() {
                     </CardHeader>
                     <CardContent>
                         {shoppingLists.length > 0 ? (
-                            <ShoppingListView lists={shoppingLists} onUpdate={loadData} />
+                            <p className="text-gray-600">Shopping list view coming soon...</p>
                         ) : (
                             <div className="text-center py-8 text-gray-500">
                                 <p>No shopping lists yet.</p>
