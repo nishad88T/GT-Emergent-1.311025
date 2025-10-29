@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import emergentAPI from "@/api/emergentClient";
-import ShoppingListForm from '../components/shoppinglist/ShoppingListForm';
-import ShoppingListView from '../components/shoppinglist/ShoppingListView';
 
 function ShoppingList() {
     const [shoppingLists, setShoppingLists] = useState([]);
