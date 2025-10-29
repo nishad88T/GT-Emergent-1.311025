@@ -261,15 +261,15 @@ async def process_receipt_in_background(
 ) -> Dict[str, Any]:
     """
     Orchestrates the receipt processing pipeline
-    Calls textract_ocr and enhance_receipt_with_llm
+    Now calls real AWS Textract and enhanced LLM processing
     """
     try:
-        logger.info(f"Processing receipt {receipt_id} in background")
+        logger.info(f"Processing receipt {receipt_id} with real integrations")
         
-        # Step 1: OCR
-        textract_data = await textract_ocr_placeholder(image_urls)
+        # Step 1: Real OCR with AWS Textract
+        textract_data = await textract_ocr_real(image_urls)
         
-        # Step 2: LLM Enhancement
+        # Step 2: LLM Enhancement (still placeholder for OpenAI)
         enhanced_data = await enhance_receipt_with_llm_placeholder(
             textract_data, store_name, total_amount, 'GBP'
         )
@@ -279,7 +279,8 @@ async def process_receipt_in_background(
             "items": enhanced_data["items"],
             "receipt_insights": enhanced_data["receipt_insights"],
             "validation_status": "review_insights",
-            "updated_date": datetime.utcnow().isoformat()
+            "updated_date": datetime.utcnow().isoformat(),
+            "textract_data": textract_data  # Store OCR results
         }
         
         await db.receipts.update_one(
@@ -287,7 +288,7 @@ async def process_receipt_in_background(
             {"$set": update_data}
         )
         
-        logger.info(f"Receipt {receipt_id} processed successfully")
+        logger.info(f"Receipt {receipt_id} processed with real Textract")
         return {"status": "success", "receipt_id": receipt_id}
         
     except Exception as e:
