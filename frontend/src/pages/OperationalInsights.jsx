@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Download, TrendingUp, DollarSign, Users, Activity } from "lucide-react";
 import { getComprehensiveCreditReport } from "@/api/functions";
-import AdminCreditAnalytics from "../components/admin/AdminCreditAnalytics";
-import AdminUsageMetrics from "../components/admin/AdminUsageMetrics";
 import emergentAPI from "@/api/emergentClient";
 
 function OperationalInsights() {
