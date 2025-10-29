@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import emergentAPI from "@/api/emergentClient";
-import MealPlanCalendar from '../components/mealplan/MealPlanCalendar';
-import RecipeSuggestions from '../components/mealplan/RecipeSuggestions';
 
 export default function MealPlan() {
     const [mealPlans, setMealPlans] = useState([]);
