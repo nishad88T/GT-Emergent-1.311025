@@ -77,7 +77,7 @@ export default function SettingsPage() {
     
     const handleLogout = async () => {
         try {
-            await base44.auth.logout();
+            await emergentAPI.auth.logout();
             window.location.reload();
         } catch(error) {
             toast.error("Logout failed. Please try again.");
