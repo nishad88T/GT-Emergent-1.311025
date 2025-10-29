@@ -47,7 +47,7 @@ function ShoppingList() {
                         <CardTitle>Create Shopping List</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ShoppingListForm onListCreated={loadData} />
+                        <p className="text-gray-600">Shopping list creation coming soon...</p>
                     </CardContent>
                 </Card>
 
