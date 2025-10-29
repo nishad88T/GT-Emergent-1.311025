@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { User, Budget } from "@/api/entities";
+import { User, Budget as BudgetEntity } from "@/api/entities";
 import { rolloverBudget, generateModeledData } from "@/api/functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
