@@ -189,7 +189,7 @@ export default function ScanReceipt() {
         setError(null);
 
         try {
-            const user = await base44.auth.me();
+            const user = await emergentAPI.auth.me();
             if (!user || !user.household_id) {
                 throw new Error("User or household not found");
             }
@@ -198,7 +198,7 @@ export default function ScanReceipt() {
             const uploadResults = [];
             for (let i = 0; i < files.length; i++) {
                 setProcessingMessage(`Uploading image ${i + 1} of ${files.length}...`);
-                const result = await base44.integrations.Core.UploadFile({ file: files[i] });
+                const result = await emergentAPI.integrations.Core.UploadFile({ file: files[i] });
                 uploadResults.push(result);
             }
             
@@ -206,24 +206,23 @@ export default function ScanReceipt() {
 
             // Create receipt with processing_background status
             setProcessingMessage("Saving receipt...");
-            const newReceipt = await base44.entities.Receipt.create({
-                supermarket: storeName || 'Unknown Store', // Updated for robustness
+            const newReceipt = await emergentAPI.Receipt.create({
+                supermarket: storeName || 'Unknown Store',
                 store_location: storeLocation,
                 purchase_date: purchaseDate,
-                total_amount: parseFloat(totalAmount) || 0, // Updated for robustness
+                total_amount: parseFloat(totalAmount) || 0,
                 receipt_image_urls: file_urls,
                 currency: user.currency || 'GBP',
                 validation_status: 'processing_background', 
                 household_id: user.household_id,
-                user_email: user.email,
-                items: []
+                user_email: user.email
             });
 
             console.log(`Receipt ${newReceipt.id} created with processing_background status`);
 
             // Log credit consumption
             try {
-                await base44.entities.CreditLog.create({
+                await emergentAPI.CreditLog.create({
                     user_id: user.id,
                     user_email: user.email,
                     household_id: user.household_id,
@@ -240,18 +239,17 @@ export default function ScanReceipt() {
 
             // Start background processing (fire and forget)
             try {
-                base44.functions.invoke('processReceiptInBackground', {
+                await emergentAPI.functions.invoke('processReceiptInBackground', {
                     receiptId: newReceipt.id,
                     imageUrls: file_urls,
-                    storeName: storeName || 'Unknown Store', // Updated for robustness
-                    totalAmount: parseFloat(totalAmount) || 0, // Updated for robustness
+                    storeName: storeName || 'Unknown Store',
+                    totalAmount: parseFloat(totalAmount) || 0,
                     householdId: user.household_id,
                     userEmail: user.email
-                }).catch(err => {
-                    console.log("Background processing initiated, may complete asynchronously:", err);
                 });
+                console.log("Background processing initiated successfully");
             } catch (invokeError) {
-                console.log("Background processing invoked successfully");
+                console.error("Background processing invocation failed:", invokeError);
             }
 
             setBatchCount(prev => prev + 1);
