@@ -32,8 +32,6 @@ import Household from "./Household";
 
 import JoinHousehold from "./JoinHousehold";
 
-import Layout from "./Layout";
-
 import OperationalInsights from "./OperationalInsights";
 
 import TermsOfUse from "./TermsOfUse";
