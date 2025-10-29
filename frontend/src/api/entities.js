@@ -1,39 +1,22 @@
-import { base44 } from './base44Client';
+import emergentAPI from './emergentClient';
 
-
-export const Receipt = base44.entities.Receipt;
-
-export const Budget = base44.entities.Budget;
-
-export const CorrectionLog = base44.entities.CorrectionLog;
-
-export const OCRFeedback = base44.entities.OCRFeedback;
-
-export const FailedScanLog = base44.entities.FailedScanLog;
-
-export const NutritionFact = base44.entities.NutritionFact;
-
-export const FailedNutritionLookup = base44.entities.FailedNutritionLookup;
-
-export const Household = base44.entities.Household;
-
-export const HouseholdInvitation = base44.entities.HouseholdInvitation;
-
-export const CreditLog = base44.entities.CreditLog;
-
-export const AggregatedGroceryData = base44.entities.AggregatedGroceryData;
-
-export const Recipe = base44.entities.Recipe;
-
-export const IngredientMap = base44.entities.IngredientMap;
-
-export const MealPlan = base44.entities.MealPlan;
-
-export const TestRun = base44.entities.TestRun;
-
-export const OCRQualityLog = base44.entities.OCRQualityLog;
-
-
+// Export entities from our new Emergent API client
+export const Receipt = emergentAPI.Receipt;
+export const Budget = emergentAPI.Budget;
+export const CorrectionLog = emergentAPI.CorrectionLog;
+export const OCRFeedback = emergentAPI.OCRFeedback;
+export const FailedScanLog = emergentAPI.FailedScanLog;
+export const NutritionFact = emergentAPI.NutritionFact;
+export const FailedNutritionLookup = emergentAPI.FailedNutritionLookup;
+export const Household = emergentAPI.Household;
+export const HouseholdInvitation = emergentAPI.HouseholdInvitation;
+export const CreditLog = emergentAPI.CreditLog;
+export const AggregatedGroceryData = emergentAPI.AggregatedGroceryData;
+export const Recipe = emergentAPI.Recipe;
+export const IngredientMap = emergentAPI.IngredientMap;
+export const MealPlan = emergentAPI.MealPlan;
+export const TestRun = emergentAPI.TestRun;
+export const OCRQualityLog = emergentAPI.OCRQualityLog;
 
 // auth sdk:
-export const User = base44.auth;
+export const User = emergentAPI.auth;
