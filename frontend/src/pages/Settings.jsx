@@ -28,7 +28,7 @@ import MobileAppInstructions from '../components/settings/MobileAppInstructions'
 import DataRecoverySection from '@/components/settings/DataRecoverySection';
 import { useUserFeatures } from '@/components/shared/FeatureGuard';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { base44 } from "@/api/base44Client";
+import emergentAPI from "@/api/emergentClient";
 
 
 export default function SettingsPage() {
