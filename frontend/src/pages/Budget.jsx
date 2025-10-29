@@ -1,255 +1,192 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Budget } from "@/api/entities";
-import { Receipt } from "@/api/entities";
-import { User } from "@/api/entities";
-import { Household } from "@/api/entities";
+import { User, Budget } from "@/api/entities";
+import { rolloverBudget, generateModeledData } from "@/api/functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { Plus, PiggyBank } from "lucide-react";
-
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { PlusCircle, TrendingUp, DollarSign, Calendar, AlertCircle, Target } from "lucide-react";
 import BudgetSetup from "../components/budget/BudgetSetup";
-import CurrentBudgetStatus from "../components/budget/CurrentBudgetStatus";
 import BudgetHistory from "../components/budget/BudgetHistory";
-import { isWithinInterval, isPast, format, addDays, differenceInDays } from "date-fns";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, RefreshCw, AlertTriangle } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import CurrentBudgetStatus from "../components/budget/CurrentBudgetStatus";
+import emergentAPI from "@/api/emergentClient";
 
-export default function BudgetPage() {
-    const [budgets, setBudgets] = useState([]);
-    const [receipts, setReceipts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [isSettingUp, setIsSettingUp] = useState(false);
+function Budget() {
     const [currentUser, setCurrentUser] = useState(null);
-    const [household, setHousehold] = useState(null);
-    const [showRolloverPrompt, setShowRolloverPrompt] = useState(false);
-    const [isRollingOver, setIsRollingOver] = useState(false);
-    const [userCurrency, setUserCurrency] = useState('USD');
-    
-    const activeBudget = budgets.find(b => b.is_active);
-    
-    const isCurrentUserAdmin = currentUser && household && currentUser.id === household.admin_id;
-
-    const formatCurrency = (amount, currency) => {
-        const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-        if (isNaN(numericAmount)) {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: currency,
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            }).format(0);
-        }
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: currency,
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }).format(numericAmount);
-    };
+    const [budgets, setBudgets] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [currentBudget, setCurrentBudget] = useState(null);
+    const [budgetStatus, setBudgetStatus] = useState(null);
 
     const loadData = useCallback(async () => {
-        setLoading(true);
         try {
-            const user = await User.me();
-            setCurrentUser(user);
-            if (user) {
-                setUserCurrency(user.currency || 'USD'); 
-                
-                if (user.household_id) {
-                    const householdResults = await Household.filter({ id: user.household_id });
-                    if (householdResults && householdResults.length > 0) {
-                        setHousehold(householdResults[0]);
-                    } else {
-                        setHousehold(null);
-                    }
+            setLoading(true);
+            const userData = await User.me();
+            setCurrentUser(userData);
 
-                    const [budgetData, receiptData] = await Promise.all([
-                        Budget.filter({ household_id: user.household_id }, "-created_date"),
-                        Receipt.filter({ household_id: user.household_id }),
-                    ]);
-                    setBudgets(budgetData || []);
-                    setReceipts(receiptData || []);
-                } else {
-                    setBudgets([]);
-                    setReceipts([]);
-                    setHousehold(null);
-                }
-            } else {
-                setCurrentUser(null);
+            if (!userData || !userData.household_id) {
                 setBudgets([]);
-                setReceipts([]);
-                setHousehold(null);
+                setCurrentBudget(null);
+                setBudgetStatus(null);
+                setLoading(false);
+                return;
             }
+
+            const budgetData = await Budget.filter({ household_id: userData.household_id }, "-created_date", 10);
+            setBudgets(budgetData || []);
+
+            // Find active budget
+            const activeBudget = budgetData?.find(b => b.is_active) || null;
+            setCurrentBudget(activeBudget);
+
+            // Calculate budget status if we have an active budget
+            if (activeBudget) {
+                const status = {
+                    totalSpent: activeBudget.total_spent || 0,
+                    totalBudget: activeBudget.amount,
+                    remainingBudget: activeBudget.amount - (activeBudget.total_spent || 0),
+                    percentageUsed: Math.round(((activeBudget.total_spent || 0) / activeBudget.amount) * 100),
+                    daysRemaining: calculateDaysRemaining(activeBudget.period_end),
+                    categoryBreakdown: activeBudget.category_limits || {}
+                };
+                setBudgetStatus(status);
+            } else {
+                setBudgetStatus(null);
+            }
+
         } catch (error) {
-            console.error("Failed to load budget data:", error);
-            setBudgets([]);
-            setReceipts([]);
-            setHousehold(null);
+            console.error("Error loading budget data:", error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }, []);
 
     useEffect(() => {
         loadData();
     }, [loadData]);
 
-    useEffect(() => {
-        if (!loading && !isSettingUp && isCurrentUserAdmin && activeBudget) {
-            if (isPast(new Date(activeBudget.period_end))) {
-                setShowRolloverPrompt(true);
-            } else {
-                setShowRolloverPrompt(false);
-            }
-        } else {
-            setShowRolloverPrompt(false);
-        }
-    }, [loading, isSettingUp, isCurrentUserAdmin, activeBudget]);
+    const calculateDaysRemaining = (endDate) => {
+        if (!endDate) return 0;
+        const end = new Date(endDate);
+        const now = new Date();
+        const diffTime = end - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return Math.max(0, diffDays);
+    };
 
-    const currentPeriodReceipts = activeBudget ? receipts.filter(receipt =>
-        isWithinInterval(new Date(receipt.purchase_date), {
-            start: new Date(activeBudget.period_start),
-            end: new Date(activeBudget.period_end)
-        })
-    ) : [];
-
-    const handleBudgetSaved = () => {
-        setIsSettingUp(false);
+    const handleBudgetCreated = () => {
         loadData();
     };
 
-    const handleRollover = async () => {
-        if (!activeBudget || !currentUser) return;
+    const handleRolloverBudget = async () => {
+        if (!currentUser || !currentBudget) return;
 
-        setIsRollingOver(true);
         try {
-            const response = await base44.functions.invoke('rolloverBudget');
-            
-            if (response.data.success) {
-                const oldBudgetInfo = response.data.old_budget;
-                const newBudgetInfo = response.data.new_budget;
-                
-                console.log("Budget rolled over successfully:", response.data);
-                
-                alert(`Budget rolled over! Previous period: You spent ${formatCurrency(oldBudgetInfo.total_spent, userCurrency)} out of ${formatCurrency(oldBudgetInfo.budget_amount, userCurrency)}. New period starts with ${formatCurrency(newBudgetInfo.budget_amount, userCurrency)}.`);
-            } else {
-                alert(`Failed to roll over budget: ${response.data.message || 'Unknown error'}`);
-            }
-
+            await rolloverBudget({
+                household_id: currentUser.household_id,
+                user_email: currentUser.email
+            });
             await loadData();
-            setShowRolloverPrompt(false);
         } catch (error) {
-            console.error("Failed to roll over budget:", error);
-            alert("Failed to roll over budget. Please try again.");
-        } finally {
-            setIsRollingOver(false);
+            console.error("Error rolling over budget:", error);
         }
     };
 
+    const handleGenerateTestData = async () => {
+        if (!currentUser) return;
+
+        try {
+            await generateModeledData({
+                action: "generate",
+                user_email: currentUser.email,
+                household_id: currentUser.household_id
+            });
+            await loadData();
+        } catch (error) {
+            console.error("Error generating test data:", error);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-lg">Loading budget data...</div>
+            </div>
+        );
+    }
+
     return (
-        <div className="p-4 md:p-8 bg-gradient-to-br from-emerald-50 via-white to-teal-50 min-h-screen">
-            <div className="max-w-7xl mx-auto">
-                {showRolloverPrompt && isCurrentUserAdmin && activeBudget && (
-                    <Alert className="mb-6 bg-yellow-50 border-yellow-200 text-yellow-800">
-                        <AlertTriangle className="h-4 w-4" />
-                        <AlertTitle className="font-semibold">Budget Period Ended!</AlertTitle>
-                        <AlertDescription>
-                            Your budget period for{" "}
-                            <span className="font-medium">
-                                {format(new Date(activeBudget.period_start), "MMM dd, yyyy")} -{" "}
-                                {format(new Date(activeBudget.period_end), "MMM dd, yyyy")}
-                            </span>{" "}
-                            has ended. Would you like to set up a new budget for the next period, starting fresh with the same amount ({formatCurrency(activeBudget.amount, userCurrency)})?
-                        </AlertDescription>
-                        <Button 
-                            onClick={handleRollover}
-                            className="mt-4 bg-yellow-600 hover:bg-yellow-700 text-white"
-                            disabled={isRollingOver}
-                        >
-                            {isRollingOver ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            ) : (
-                                <RefreshCw className="mr-2 h-4 w-4" />
-                            )}
-                            {isRollingOver ? "Setting Up..." : "Start New Budget Period"}
+        <div className="container mx-auto p-6">
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <h1 className="text-3xl font-bold mb-2">Budget Management</h1>
+                    <p className="text-gray-600">Track your spending and stay within your limits</p>
+                </div>
+                
+                {currentBudget && (
+                    <div className="flex gap-2">
+                        <Button onClick={handleRolloverBudget} variant="outline">
+                            <Calendar className="w-4 h-4 mr-2" />
+                            Rollover Budget
                         </Button>
-                    </Alert>
-                )}
-
-                <motion.div 
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4"
-                >
-                    <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                           <PiggyBank className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                            <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Budget Tracker</h1>
-                            <p className="text-slate-600">Set spending goals and stay on track</p>
-                        </div>
-                    </div>
-                    {!isSettingUp && isCurrentUserAdmin && !showRolloverPrompt && (
-                        <Button 
-                            onClick={() => setIsSettingUp(true)}
-                            style={{
-                                background: 'linear-gradient(to right, #10b981, #0d9488)',
-                                color: 'white',
-                                border: 'none'
-                            }}
-                            className="shadow-lg hover:shadow-xl transition-all duration-300 hover:opacity-90"
-                        >
-                            <Plus className="w-5 h-5 mr-2" />
-                            {activeBudget ? "Edit Budget" : "Set New Budget"}
+                        <Button onClick={handleGenerateTestData} variant="outline">
+                            <PlusCircle className="w-4 h-4 mr-2" />
+                            Generate Test Data
                         </Button>
-                    )}
-                </motion.div>
-
-                {isSettingUp ? (
-                    <BudgetSetup
-                        activeBudget={activeBudget}
-                        onSave={handleBudgetSaved}
-                        onCancel={() => setIsSettingUp(false)}
-                    />
-                ) : (
-                    <div className="space-y-8">
-                        {activeBudget ? (
-                            <CurrentBudgetStatus 
-                                budget={activeBudget} 
-                                receipts={currentPeriodReceipts}
-                                loading={loading}
-                            />
-                        ) : (
-                            <Card className="border-none shadow-lg bg-white/80 backdrop-blur-sm text-center py-16">
-                                <CardHeader>
-                                    <PiggyBank className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                                    <CardTitle className="text-xl font-bold text-slate-900">No Active Budget</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-slate-600 mb-4">Create a budget to start tracking your spending goals.</p>
-                                    {isCurrentUserAdmin && !showRolloverPrompt && (
-                                        <Button 
-                                            onClick={() => setIsSettingUp(true)}
-                                            style={{
-                                                background: 'linear-gradient(to right, #10b981, #0d9488)',
-                                                color: 'white',
-                                                border: 'none'
-                                            }}
-                                            className="shadow-lg hover:shadow-xl transition-all duration-300 hover:opacity-90"
-                                        >
-                                            <Plus className="w-4 h-4 mr-2" /> 
-                                            Create Your First Budget
-                                        </Button>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        )}
-                        <BudgetHistory budgets={budgets.filter(b => !b.is_active)} />
                     </div>
                 )}
             </div>
+
+            <Tabs defaultValue="current" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="current">Current Budget</TabsTrigger>
+                    <TabsTrigger value="setup">Setup Budget</TabsTrigger>
+                    <TabsTrigger value="history">Budget History</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="current" className="space-y-6">
+                    {currentBudget && budgetStatus ? (
+                        <CurrentBudgetStatus 
+                            budget={currentBudget} 
+                            status={budgetStatus}
+                            onUpdate={loadData}
+                        />
+                    ) : (
+                        <Card>
+                            <CardContent className="pt-6">
+                                <div className="text-center py-8">
+                                    <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                                    <h3 className="text-xl font-semibold mb-2">No Active Budget</h3>
+                                    <p className="text-gray-600 mb-4">Create your first budget to start tracking your spending.</p>
+                                    <Button onClick={() => document.querySelector('[data-state="inactive"][value="setup"]')?.click()}>
+                                        <PlusCircle className="w-4 h-4 mr-2" />
+                                        Create Budget
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+                </TabsContent>
+
+                <TabsContent value="setup" className="space-y-6">
+                    <BudgetSetup 
+                        currentUser={currentUser}
+                        onBudgetCreated={handleBudgetCreated}
+                        existingBudget={currentBudget}
+                    />
+                </TabsContent>
+
+                <TabsContent value="history" className="space-y-6">
+                    <BudgetHistory 
+                        budgets={budgets}
+                        onUpdate={loadData}
+                    />
+                </TabsContent>
+            </Tabs>
         </div>
     );
 }
+
+export default Budget;
