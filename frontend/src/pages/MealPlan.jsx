@@ -55,7 +55,7 @@ export default function MealPlan() {
                         <CardTitle>Recipe Suggestions</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <RecipeSuggestions onAddToMealPlan={loadData} />
+                        <p className="text-gray-600">Recipe suggestions coming soon...</p>
                     </CardContent>
                 </Card>
             </div>
