@@ -62,7 +62,7 @@ export default function Dashboard() {
     const loadData = useCallback(async () => {
         try {
             setLoading(true);
-            const userData = await User.me();
+            const userData = await emergentAPI.auth.me();
             setUser(userData);
 
             if (!userData || !userData.household_id) {
@@ -77,12 +77,12 @@ export default function Dashboard() {
             }
 
             const [receiptData, budgetData] = await Promise.all([
-                Receipt.filter({ household_id: userData.household_id }, "-purchase_date", 200),
-                Budget.filter({ household_id: userData.household_id }, "-created_date", 10),
+                emergentAPI.Receipt.filter({ household_id: userData.household_id }, "-created_date", 200),
+                emergentAPI.Budget.filter({ household_id: userData.household_id }, "-created_date", 10),
             ]);
 
             setReceipts(receiptData || []);
-            setBudgets(budgetData || []);
+            setBudgets(budgetData || []); 
             
             // Count receipts that are actively being processed
             const processingCountValue = (receiptData || []).filter(r => 
