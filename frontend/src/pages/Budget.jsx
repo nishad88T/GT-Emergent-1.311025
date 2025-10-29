@@ -34,7 +34,7 @@ function Budget() {
                 return;
             }
 
-            const budgetData = await Budget.filter({ household_id: userData.household_id }, "-created_date", 10);
+            const budgetData = await BudgetEntity.filter({ household_id: userData.household_id }, "-created_date", 10);
             setBudgets(budgetData || []);
 
             // Find active budget
