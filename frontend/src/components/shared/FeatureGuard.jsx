@@ -1,7 +1,7 @@
 import React from 'react';
 import emergentAPI from '@/api/emergentClient';
 
-export default function FeatureGuard({ children, requiredFeature, fallback = null }) {
+function FeatureGuard({ children, requiredFeature, fallback = null }) {
     // For now, return children directly as we don't have feature gating implemented
     return children;
 }
@@ -14,3 +14,7 @@ export function useUserFeatures() {
         isLoading: false
     };
 }
+
+// Export both as default and named export
+export { FeatureGuard };
+export default FeatureGuard;
