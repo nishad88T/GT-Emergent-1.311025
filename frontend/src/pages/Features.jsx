@@ -1,11 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ScanLine, TrendingUp, Lightbulb, HeartPulse, Users, Check, X } from 'lucide-react';
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import emergentAPI from "@/api/emergentClient";
 
 const Feature = ({ icon: Icon, title, description }) => (
     <div className="flex items-start gap-4 p-6 bg-white rounded-lg border border-slate-200 hover:shadow-md transition-shadow">
