@@ -81,12 +81,12 @@ export default function ScanReceipt() {
     const updateScanCount = async () => {
         if (!currentUser?.tier || currentUser.tier !== 'premium') {
             try {
-                const currentUserData = await base44.auth.me();
+                const currentUserData = await emergentAPI.auth.me();
                 const currentDate = new Date().toISOString().split('T')[0];
                 const lastResetDate = currentUserData.last_scan_reset_date;
                 
                 if (!lastResetDate) {
-                    await base44.auth.updateMe({
+                    await emergentAPI.auth.updateMe({
                         monthly_scan_count: 1,
                         last_scan_reset_date: currentDate
                     });
@@ -97,12 +97,12 @@ export default function ScanReceipt() {
                                      (today.getMonth() - lastReset.getMonth());
                     
                     if (monthsDiff >= 1) {
-                        await base44.auth.updateMe({
+                        await emergentAPI.auth.updateMe({
                             monthly_scan_count: 1,
                             last_scan_reset_date: currentDate
                         });
                     } else {
-                        await base44.auth.updateMe({
+                        await emergentAPI.auth.updateMe({
                             monthly_scan_count: (currentUserData.monthly_scan_count || 0) + 1
                         });
                     }
