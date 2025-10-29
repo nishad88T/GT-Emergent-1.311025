@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import emergentAPI from "@/api/emergentClient";
-import OCRTestingResults from "../components/testing/OCRTestingResults";
-import TestRunManager from "../components/testing/TestRunManager";
 
 function OCRTestingDashboard() {
     const [testRuns, setTestRuns] = useState([]);
@@ -44,7 +42,7 @@ function OCRTestingDashboard() {
                         <CardTitle>Test Run Management</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <TestRunManager onUpdate={loadTestRuns} />
+                        <p className="text-gray-600">OCR testing features coming soon...</p>
                     </CardContent>
                 </Card>
 
@@ -53,7 +51,7 @@ function OCRTestingDashboard() {
                         <CardTitle>Test Results</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <OCRTestingResults testRuns={testRuns} />
+                        <p className="text-gray-600">Test results will appear here...</p>
                     </CardContent>
                 </Card>
             </div>
