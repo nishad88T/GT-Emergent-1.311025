@@ -165,18 +165,25 @@ function Budget() {
                 </TabsContent>
 
                 <TabsContent value="setup" className="space-y-6">
-                    <BudgetSetup 
-                        currentUser={currentUser}
-                        onBudgetCreated={handleBudgetCreated}
-                        existingBudget={currentBudget}
-                    />
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Budget Setup</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-gray-600">Budget creation form coming soon...</p>
+                        </CardContent>
+                    </Card>
                 </TabsContent>
 
                 <TabsContent value="history" className="space-y-6">
-                    <BudgetHistory 
-                        budgets={budgets}
-                        onUpdate={loadData}
-                    />
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Budget History</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-gray-600">Budget history view coming soon...</p>
+                        </CardContent>
+                    </Card>
                 </TabsContent>
             </Tabs>
         </div>
