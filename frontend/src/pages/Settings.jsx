@@ -93,7 +93,7 @@ export default function SettingsPage() {
     const handleDeleteAccount = async () => {
         setIsDeleting(true);
         try {
-            const response = await base44.functions.invoke('deleteUserAccount');
+            const response = await emergentAPI.functions.invoke('deleteUserAccount');
             if (response.data && response.data.message) {
                 toast.success(response.data.message);
                 setTimeout(async () => {
