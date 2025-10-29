@@ -62,7 +62,7 @@ export default function SettingsPage() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await base44.auth.updateMe({ 
+            await emergentAPI.auth.updateMe({ 
                 currency,
                 week_starts_on: weekStartsOn
             });
