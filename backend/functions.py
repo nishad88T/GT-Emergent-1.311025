@@ -198,25 +198,9 @@ async def enhance_receipt_with_llm_placeholder(
 
 async def calorie_ninjas_nutrition_placeholder(canonical_name: str, household_id: str) -> Dict[str, Any]:
     """
-    Placeholder for CalorieNinjas API
-    Replace with actual CalorieNinjas integration when API key is provided
+    This now calls the real CalorieNinjas API
     """
-    logger.info(f"[PLACEHOLDER] Nutrition lookup called for: {canonical_name}")
-    
-    return {
-        "status": "placeholder",
-        "message": "CalorieNinjas integration pending - provide API key",
-        "canonical_name": canonical_name,
-        "calories": 150,
-        "protein_g": 8,
-        "carbohydrate_g": 20,
-        "fat_g": 5,
-        "fiber_g": 2,
-        "sugar_g": 10,
-        "sodium_mg": 100,
-        "serving_size_g": 100,
-        "cached": False
-    }
+    return await calorie_ninjas_nutrition_real(canonical_name, household_id)
 
 async def send_email_placeholder(to: str, subject: str, body: str) -> Dict[str, Any]:
     """
