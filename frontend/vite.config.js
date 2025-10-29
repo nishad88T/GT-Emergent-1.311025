@@ -21,4 +21,9 @@ export default defineConfig({
       },
     },
   },
+  define: {
+    // For backward compatibility with process.env
+    'process.env': {}
+  },
+  envPrefix: ['REACT_APP_', 'VITE_']
 }) 
