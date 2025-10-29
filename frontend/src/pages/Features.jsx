@@ -20,14 +20,14 @@ export default function FeaturesPage() {
 
     const handleGetStarted = async () => {
         try {
-            const isAuth = await base44.auth.isAuthenticated();
+            const isAuth = await emergentAPI.auth.isAuthenticated();
             if (isAuth) {
                 navigate(createPageUrl('Dashboard'));
             } else {
-                await base44.auth.redirectToLogin();
+                await emergentAPI.auth.redirectToLogin();
             }
         } catch (error) {
-            await base44.auth.redirectToLogin();
+            await emergentAPI.auth.redirectToLogin();
         }
     };
 
