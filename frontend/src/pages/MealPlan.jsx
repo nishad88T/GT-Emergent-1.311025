@@ -46,7 +46,7 @@ export default function MealPlan() {
                         <CardTitle>Weekly Meal Plan</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <MealPlanCalendar mealPlans={mealPlans} onUpdate={loadData} />
+                        <p className="text-gray-600">Meal planning calendar coming soon...</p>
                     </CardContent>
                 </Card>
 
