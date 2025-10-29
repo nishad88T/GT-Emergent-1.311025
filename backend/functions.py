@@ -1,0 +1,607 @@
+import os
+import logging
+from typing import Dict, Any, List, Optional
+from datetime import datetime, timedelta
+import random
+import string
+
+logger = logging.getLogger(__name__)
+
+# ==================== PLACEHOLDER INTEGRATIONS ====================
+
+async def textract_ocr_placeholder(image_urls: List[str]) -> Dict[str, Any]:
+    """
+    Placeholder for AWS Textract OCR
+    Replace with actual AWS Textract integration when keys are provided
+    """
+    logger.info(f"[PLACEHOLDER] Textract OCR called for {len(image_urls)} images")
+    
+    # Mock response
+    return {
+        "status": "placeholder",
+        "message": "Textract integration pending - provide AWS credentials",
+        "extracted_text": "Sample extracted text from receipt",
+        "items": [
+            {"name": "Sample Item 1", "price": "5.99"},
+            {"name": "Sample Item 2", "price": "3.49"}
+        ]
+    }
+
+async def enhance_receipt_with_llm_placeholder(
+    textract_data: Dict[str, Any],
+    store_name: str,
+    total_amount: float,
+    currency: str
+) -> Dict[str, Any]:
+    """
+    Placeholder for GPT-4 Vision LLM enhancement
+    Replace with actual OpenAI integration when keys are provided
+    """
+    logger.info(f"[PLACEHOLDER] LLM Enhancement called for store: {store_name}")
+    
+    # Mock canonicalized items
+    return {
+        "items": [
+            {
+                "name": "Sample Item 1",
+                "canonical_name": "Milk Whole 2L",
+                "category": "Dairy",
+                "quantity": 1,
+                "unit_price": 5.99,
+                "total_price": 5.99,
+                "pack_size": "2L",
+                "price_per_unit": 2.995,
+                "discount_applied": False,
+                "offer_description": None,
+                "approval_state": "pending"
+            },
+            {
+                "name": "Sample Item 2",
+                "canonical_name": "Bread Wholemeal",
+                "category": "Grains & Bakery",
+                "quantity": 1,
+                "unit_price": 3.49,
+                "total_price": 3.49,
+                "pack_size": "800g",
+                "price_per_unit": 4.3625,
+                "discount_applied": False,
+                "offer_description": None,
+                "approval_state": "pending"
+            }
+        ],
+        "receipt_insights": {
+            "summary": "This is a placeholder AI summary. Real insights will be generated when GPT-4 Vision is integrated.",
+            "highlights": [
+                "2 items scanned",
+                "Total: £" + str(total_amount)
+            ]
+        }
+    }
+
+async def calorie_ninjas_nutrition_placeholder(canonical_name: str, household_id: str) -> Dict[str, Any]:
+    """
+    Placeholder for CalorieNinjas API
+    Replace with actual CalorieNinjas integration when API key is provided
+    """
+    logger.info(f"[PLACEHOLDER] Nutrition lookup called for: {canonical_name}")
+    
+    return {
+        "status": "placeholder",
+        "message": "CalorieNinjas integration pending - provide API key",
+        "canonical_name": canonical_name,
+        "calories": 150,
+        "protein_g": 8,
+        "carbohydrate_g": 20,
+        "fat_g": 5,
+        "fiber_g": 2,
+        "sugar_g": 10,
+        "sodium_mg": 100,
+        "serving_size_g": 100,
+        "cached": False
+    }
+
+async def send_email_placeholder(to: str, subject: str, body: str) -> Dict[str, Any]:
+    """
+    Placeholder for Email Service (Brevo)
+    Replace with actual email integration when configured
+    """
+    logger.info(f"[PLACEHOLDER] Email send called to: {to}, subject: {subject}")
+    
+    return {
+        "status": "placeholder",
+        "message": "Email service pending - configure Brevo or SMTP",
+        "to": to,
+        "subject": subject,
+        "sent": False
+    }
+
+async def analyze_ocr_feedback_with_llm_placeholder(feedback_logs: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Placeholder for GPT-4 Turbo OCR feedback analysis
+    Replace with actual OpenAI integration when keys are provided
+    """
+    logger.info(f"[PLACEHOLDER] OCR feedback analysis called for {len(feedback_logs)} logs")
+    
+    return {
+        "status": "placeholder",
+        "message": "LLM analysis pending - provide OpenAI API key",
+        "summary": "Placeholder analysis summary",
+        "common_errors": ["Sample error type 1", "Sample error type 2"],
+        "recommendations": ["Sample recommendation 1", "Sample recommendation 2"]
+    }
+
+# ==================== BACKEND FUNCTIONS ====================
+
+async def process_receipt_in_background(
+    receipt_id: str,
+    image_urls: List[str],
+    store_name: str,
+    total_amount: float,
+    household_id: str,
+    user_email: str,
+    db
+) -> Dict[str, Any]:
+    """
+    Orchestrates the receipt processing pipeline
+    Calls textract_ocr and enhance_receipt_with_llm
+    """
+    try:
+        logger.info(f"Processing receipt {receipt_id} in background")
+        
+        # Step 1: OCR
+        textract_data = await textract_ocr_placeholder(image_urls)
+        
+        # Step 2: LLM Enhancement
+        enhanced_data = await enhance_receipt_with_llm_placeholder(
+            textract_data, store_name, total_amount, 'GBP'
+        )
+        
+        # Step 3: Update receipt in database
+        update_data = {
+            "items": enhanced_data["items"],
+            "receipt_insights": enhanced_data["receipt_insights"],
+            "validation_status": "review_insights",
+            "updated_date": datetime.utcnow().isoformat()
+        }
+        
+        await db.receipts.update_one(
+            {"id": receipt_id},
+            {"$set": update_data}
+        )
+        
+        logger.info(f"Receipt {receipt_id} processed successfully")
+        return {"status": "success", "receipt_id": receipt_id}
+        
+    except Exception as e:
+        logger.error(f"Error processing receipt {receipt_id}: {str(e)}")
+        
+        # Update receipt status to error
+        await db.receipts.update_one(
+            {"id": receipt_id},
+            {"$set": {
+                "validation_status": "error",
+                "processing_error": str(e)
+            }}
+        )
+        
+        raise
+
+async def generate_receipt_insights_in_background(
+    receipt_id: str,
+    image_urls: List[str],
+    store_name: str,
+    total_amount: float,
+    household_id: str,
+    user_email: str,
+    db
+) -> None:
+    """
+    Alias for process_receipt_in_background
+    """
+    return await process_receipt_in_background(
+        receipt_id, image_urls, store_name, total_amount, household_id, user_email, db
+    )
+
+async def ons_data_fetcher() -> List[Dict[str, Any]]:
+    """
+    Fetches UK inflation data from ONS API
+    This is a real API with no auth required
+    """
+    logger.info("Fetching ONS inflation data")
+    
+    # Placeholder - implement actual ONS API call
+    return [
+        {"date": "2024-01", "inflation_rate": 4.0},
+        {"date": "2024-02", "inflation_rate": 3.8},
+        {"date": "2024-03", "inflation_rate": 3.5}
+    ]
+
+def generate_invitation_token() -> str:
+    """Generate a random invitation token"""
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=32))
+
+async def send_invitation(
+    invitee_email: str,
+    inviter_name: str,
+    invitation_link: str,
+    household_id: str,
+    db
+) -> Dict[str, Any]:
+    """
+    Creates household invitation and sends email
+    """
+    try:
+        token = generate_invitation_token()
+        expires_at = datetime.utcnow() + timedelta(days=7)
+        
+        # Create invitation record
+        invitation = {
+            "id": generate_uuid(),
+            "household_id": household_id,
+            "invitee_email": invitee_email,
+            "inviter_name": inviter_name,
+            "token": token,
+            "status": "pending",
+            "expires_at": expires_at.isoformat(),
+            "created_date": datetime.utcnow().isoformat()
+        }
+        
+        await db.household_invitations.insert_one(invitation)
+        
+        # Send email (placeholder)
+        email_result = await send_email_placeholder(
+            to=invitee_email,
+            subject=f"You're invited to join {inviter_name}'s household",
+            body=f"Click here to join: {invitation_link}?token={token}"
+        )
+        
+        return {
+            "invitation_id": invitation["id"],
+            "token": token,
+            "email_sent": email_result.get("sent", False),
+            "status": "pending"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error sending invitation: {str(e)}")
+        raise
+
+async def delete_user_account(user_id: str, user_email: str, db) -> Dict[str, Any]:
+    """
+    Deletes user account and all associated data
+    """
+    try:
+        deleted_summary = {
+            "receipts": 0,
+            "budgets": 0,
+            "household_invitations": 0,
+            "nutrition_facts": 0,
+            "credit_logs": 0
+        }
+        
+        # Delete user data from all collections
+        result = await db.receipts.delete_many({"user_email": user_email})
+        deleted_summary["receipts"] = result.deleted_count
+        
+        result = await db.budgets.delete_many({"user_email": user_email})
+        deleted_summary["budgets"] = result.deleted_count
+        
+        result = await db.household_invitations.delete_many({"invitee_email": user_email})
+        deleted_summary["household_invitations"] = result.deleted_count
+        
+        result = await db.nutrition_facts.delete_many({"user_email": user_email})
+        deleted_summary["nutrition_facts"] = result.deleted_count
+        
+        result = await db.credit_logs.delete_many({"user_email": user_email})
+        deleted_summary["credit_logs"] = result.deleted_count
+        
+        # Send confirmation email (placeholder)
+        await send_email_placeholder(
+            to=user_email,
+            subject="Account Deleted",
+            body=f"Your account has been deleted. Summary: {deleted_summary}"
+        )
+        
+        return {
+            "status": "success",
+            "message": "Account deleted successfully",
+            "summary": deleted_summary
+        }
+        
+    except Exception as e:
+        logger.error(f"Error deleting account: {str(e)}")
+        raise
+
+async def assign_household_to_old_receipts(user_email: str, household_id: str, db) -> Dict[str, Any]:
+    """
+    Data recovery: assign household_id to old receipts
+    """
+    try:
+        # Find receipts without household_id
+        result = await db.receipts.update_many(
+            {"user_email": user_email, "household_id": {"$exists": False}},
+            {"$set": {"household_id": household_id}}
+        )
+        
+        receipts_updated = result.modified_count
+        
+        # Do same for budgets
+        result = await db.budgets.update_many(
+            {"user_email": user_email, "household_id": {"$exists": False}},
+            {"$set": {"household_id": household_id}}
+        )
+        
+        budgets_updated = result.modified_count
+        
+        return {
+            "status": "success",
+            "receipts_updated": receipts_updated,
+            "budgets_updated": budgets_updated
+        }
+        
+    except Exception as e:
+        logger.error(f"Error assigning household: {str(e)}")
+        raise
+
+async def generate_modeled_data(action: str, user_email: str, household_id: str, db) -> Dict[str, Any]:
+    """
+    Generates or removes synthetic test data
+    """
+    try:
+        if action == "generate":
+            # Generate mock receipts
+            mock_receipts = []
+            for i in range(10):
+                receipt = {
+                    "id": generate_uuid(),
+                    "supermarket": f"Test Store {i+1}",
+                    "purchase_date": (datetime.utcnow() - timedelta(days=i*3)).isoformat().split('T')[0],
+                    "total_amount": round(random.uniform(20, 150), 2),
+                    "items": [],
+                    "household_id": household_id,
+                    "user_email": user_email,
+                    "is_test_data": True,
+                    "validation_status": "review_insights",
+                    "currency": "GBP",
+                    "created_date": datetime.utcnow().isoformat()
+                }
+                mock_receipts.append(receipt)
+            
+            await db.receipts.insert_many(mock_receipts)
+            
+            return {
+                "status": "success",
+                "message": f"Generated {len(mock_receipts)} test receipts"
+            }
+            
+        elif action == "remove":
+            result = await db.receipts.delete_many({
+                "user_email": user_email,
+                "is_test_data": True
+            })
+            
+            return {
+                "status": "success",
+                "message": f"Removed {result.deleted_count} test receipts"
+            }
+        
+        return {"status": "error", "message": "Invalid action"}
+        
+    except Exception as e:
+        logger.error(f"Error with modeled data: {str(e)}")
+        raise
+
+async def get_comprehensive_credit_report(start_date: Optional[str], end_date: Optional[str], db) -> Dict[str, Any]:
+    """
+    Admin function: comprehensive credit usage report
+    """
+    try:
+        filter_query = {}
+        if start_date:
+            filter_query["timestamp"] = {"$gte": datetime.fromisoformat(start_date)}
+        if end_date:
+            if "timestamp" not in filter_query:
+                filter_query["timestamp"] = {}
+            filter_query["timestamp"]["$lte"] = datetime.fromisoformat(end_date)
+        
+        credit_logs = await db.credit_logs.find(filter_query).to_list(10000)
+        
+        report = {
+            "total_credits_consumed": sum(log.get("credits_consumed", 0) for log in credit_logs),
+            "total_events": len(credit_logs),
+            "by_event_type": {},
+            "by_user": {}
+        }
+        
+        for log in credit_logs:
+            event_type = log.get("event_type", "unknown")
+            user_email = log.get("user_email", "unknown")
+            credits = log.get("credits_consumed", 0)
+            
+            # Aggregate by event type
+            if event_type not in report["by_event_type"]:
+                report["by_event_type"][event_type] = {"count": 0, "credits": 0}
+            report["by_event_type"][event_type]["count"] += 1
+            report["by_event_type"][event_type]["credits"] += credits
+            
+            # Aggregate by user
+            if user_email not in report["by_user"]:
+                report["by_user"][user_email] = {"events": 0, "credits": 0}
+            report["by_user"][user_email]["events"] += 1
+            report["by_user"][user_email]["credits"] += credits
+        
+        return report
+        
+    except Exception as e:
+        logger.error(f"Error generating credit report: {str(e)}")
+        raise
+
+async def create_test_run(name: str, description: str, created_by_email: str, db) -> Dict[str, Any]:
+    """
+    Creates a new OCR testing test run
+    """
+    try:
+        test_run = {
+            "id": generate_uuid(),
+            "name": name,
+            "description": description or "",
+            "version": "1.0",
+            "status": "pending_receipts",
+            "receipt_ids": [],
+            "total_receipts": 0,
+            "reviewed_receipts": 0,
+            "created_by_email": created_by_email,
+            "created_date": datetime.utcnow().isoformat()
+        }
+        
+        await db.test_runs.insert_one(test_run)
+        
+        return test_run
+        
+    except Exception as e:
+        logger.error(f"Error creating test run: {str(e)}")
+        raise
+
+async def submit_ocr_quality_feedback(
+    test_run_id: str,
+    receipt_id: str,
+    feedback_items: List[Dict[str, Any]],
+    receipt_quality: str,
+    receipt_length_category: str,
+    store_name: str,
+    reviewer_id: str,
+    reviewer_email: str,
+    db
+) -> Dict[str, Any]:
+    """
+    Submits OCR quality feedback for a receipt in a test run
+    """
+    try:
+        # Log each feedback item
+        for feedback in feedback_items:
+            quality_log = {
+                "id": generate_uuid(),
+                "test_run_id": test_run_id,
+                "receipt_id": receipt_id,
+                "error_origin": feedback.get("error_origin"),
+                "error_type": feedback.get("error_type"),
+                "original_value": feedback.get("original_value"),
+                "corrected_value": feedback.get("corrected_value"),
+                "comment": feedback.get("comment"),
+                "is_critical_error": feedback.get("is_critical_error", False),
+                "receipt_quality": receipt_quality,
+                "receipt_length_category": receipt_length_category,
+                "store_name": store_name,
+                "reviewer_id": reviewer_id,
+                "reviewer_email": reviewer_email,
+                "timestamp": datetime.utcnow().isoformat()
+            }
+            
+            await db.ocr_quality_logs.insert_one(quality_log)
+        
+        # Update test run reviewed count
+        await db.test_runs.update_one(
+            {"id": test_run_id},
+            {"$inc": {"reviewed_receipts": 1}}
+        )
+        
+        return {"status": "success", "message": "Feedback submitted"}
+        
+    except Exception as e:
+        logger.error(f"Error submitting feedback: {str(e)}")
+        raise
+
+async def analyze_ocr_feedback_batch(test_run_id: str, db) -> Dict[str, Any]:
+    """
+    Analyzes all OCR feedback for a test run using LLM
+    """
+    try:
+        # Get all feedback logs for this test run
+        feedback_logs = await db.ocr_quality_logs.find({"test_run_id": test_run_id}).to_list(1000)
+        
+        # Use LLM to analyze (placeholder)
+        analysis = await analyze_ocr_feedback_with_llm_placeholder(feedback_logs)
+        
+        # Update test run with analysis
+        await db.test_runs.update_one(
+            {"id": test_run_id},
+            {"$set": {
+                "batch_analysis_summary": analysis,
+                "status": "analyzed"
+            }}
+        )
+        
+        return analysis
+        
+    except Exception as e:
+        logger.error(f"Error analyzing feedback: {str(e)}")
+        raise
+
+async def send_welcome_email(user_email: str, user_name: str) -> Dict[str, Any]:
+    """
+    Sends welcome email to new users
+    """
+    return await send_email_placeholder(
+        to=user_email,
+        subject="Welcome to GroceryTrack!",
+        body=f"Welcome {user_name}! Start by scanning your first receipt."
+    )
+
+async def send_test_email(to: str, subject: str, body: str) -> Dict[str, Any]:
+    """
+    Utility function to send test emails
+    """
+    return await send_email_placeholder(to=to, subject=subject, body=body)
+
+async def rollover_budget(household_id: str, user_email: str, db) -> Dict[str, Any]:
+    """
+    Closes active budget and creates new one for next period
+    """
+    try:
+        # Find active budget
+        active_budget = await db.budgets.find_one({
+            "household_id": household_id,
+            "is_active": True
+        })
+        
+        if not active_budget:
+            return {"status": "error", "message": "No active budget found"}
+        
+        # Mark as inactive
+        await db.budgets.update_one(
+            {"id": active_budget["id"]},
+            {"$set": {"is_active": False}}
+        )
+        
+        # Create new budget for next period
+        # Logic depends on budget type (monthly/weekly)
+        return {"status": "success", "message": "Budget rolled over"}
+        
+    except Exception as e:
+        logger.error(f"Error rolling over budget: {str(e)}")
+        raise
+
+async def aggregate_grocery_data(db) -> Dict[str, Any]:
+    """
+    Aggregates validated receipt data for market insights
+    Background job - processes all receipts
+    """
+    try:
+        # This would be a scheduled job
+        logger.info("Aggregating grocery data from validated receipts")
+        
+        # Placeholder implementation
+        return {
+            "status": "success",
+            "message": "Aggregation completed",
+            "items_processed": 0
+        }
+        
+    except Exception as e:
+        logger.error(f"Error aggregating data: {str(e)}")
+        raise
+
+# Helper function for UUID
+def generate_uuid():
+    import uuid
+    return str(uuid.uuid4())
