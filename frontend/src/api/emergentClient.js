@@ -1,8 +1,8 @@
 // API adapter to replace Base44 SDK with Emergent REST API calls
 import axios from 'axios';
 
-// Get backend URL from environment
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+// Get backend URL from environment - Vite uses import.meta.env
+const BACKEND_URL = import.meta.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 const API_BASE = `${BACKEND_URL}/api`;
 
 // Create axios instance with default config
