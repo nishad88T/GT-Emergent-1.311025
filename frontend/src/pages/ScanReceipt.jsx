@@ -71,7 +71,7 @@ export default function ScanReceipt() {
     const [currentUser, setCurrentUser] = useState(null);
 
     React.useEffect(() => {
-        base44.auth.me().then(setCurrentUser).catch(err => console.error("Failed to load user:", err));
+        emergentAPI.auth.me().then(setCurrentUser).catch(err => console.error("Failed to load user:", err));
     }, []);
 
     const handleUpgrade = () => {
