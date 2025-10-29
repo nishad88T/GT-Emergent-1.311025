@@ -158,8 +158,23 @@ function OperationalInsights() {
 
                     {/* Detailed Analytics */}
                     <div className="grid gap-6">
-                        <AdminCreditAnalytics creditReport={creditReport} />
-                        <AdminUsageMetrics creditReport={creditReport} />
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Credit Analytics</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-gray-600">Detailed credit analytics coming soon...</p>
+                            </CardContent>
+                        </Card>
+                        
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Usage Metrics</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-gray-600">Usage metrics dashboard coming soon...</p>
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
             ) : (
