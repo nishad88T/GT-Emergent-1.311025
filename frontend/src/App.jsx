@@ -667,37 +667,67 @@ function AnalyticsPage() {
   );
 }
 
-// Navigation Component with improved styling
+// Enhanced Navigation Component with all features
 function Navigation() {
   const location = useLocation();
   const navigate = useNavigate();
   
-  const navItems = [
+  const mainNavItems = [
     { path: '/', label: 'Dashboard', icon: '🏠' },
     { path: '/scan', label: 'Scan Receipt', icon: '📱' },
     { path: '/receipts', label: 'Receipts', icon: '📄' },
     { path: '/budget', label: 'Budget', icon: '💰' },
-    { path: '/analytics', label: 'Analytics', icon: '📊' }
+    { path: '/analytics', label: 'Analytics', icon: '📊' },
+    { path: '/nutrition', label: 'Nutrition', icon: '🥗' },
+  ];
+
+  const moreNavItems = [
+    { path: '/shopping-list', label: 'Shopping List', icon: '📝' },
+    { path: '/meal-plan', label: 'Meal Plan', icon: '🍽️' },
+    { path: '/household', label: 'Household', icon: '👥' },
+    { path: '/settings', label: 'Settings', icon: '⚙️' },
   ];
   
   return (
     <nav className="bg-white shadow-lg border-b">
       <div className="container mx-auto px-4">
-        <div className="flex space-x-8">
-          {navItems.map((item) => (
-            <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className={`flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
-                location.pathname === item.path
-                  ? 'border-green-500 text-green-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <span>{item.icon}</span>
-              <span>{item.label}</span>
-            </button>
-          ))}
+        <div className="flex justify-between items-center">
+          <div className="flex space-x-6">
+            {mainNavItems.map((item) => (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className={`flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
+                  location.pathname === item.path
+                    ? 'border-green-500 text-green-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </div>
+          
+          {/* More Menu Dropdown */}
+          <div className="relative">
+            <div className="flex space-x-4">
+              {moreNavItems.map((item) => (
+                <button
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  className={`flex items-center space-x-1 py-4 px-2 text-sm transition-colors ${
+                    location.pathname === item.path
+                      ? 'text-green-600'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <span className="text-xs">{item.icon}</span>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </nav>
