@@ -636,31 +636,261 @@ function BudgetPage() {
   );
 }
 
-// Simple Analytics Page
-function AnalyticsPage() {
+// Nutrition Page
+function NutritionPage() {
   const navigate = useNavigate();
-  
+  const [nutritionFacts, setNutritionFacts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadNutritionData();
+  }, []);
+
+  const loadNutritionData = async () => {
+    try {
+      const data = await emergentAPI.NutritionFact.find({ household_id: 'c756604e-d3e8-4e6e-918e-12d7d96c877d' });
+      setNutritionFacts(data || []);
+    } catch (error) {
+      console.error('Error loading nutrition data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const testNutritionLookup = async () => {
+    try {
+      const result = await emergentAPI.calorieNinjasNutrition({
+        canonical_name: 'apple',
+        household_id: 'c756604e-d3e8-4e6e-918e-12d7d96c877d'
+      });
+      alert(`Nutrition data for apple: ${result.calories} calories, ${result.protein_g}g protein`);
+    } catch (error) {
+      console.error('Error testing nutrition lookup:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        <button 
-          onClick={() => navigate('/')}
-          className="mb-6 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg"
-        >
-          ← Back to Dashboard
-        </button>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Nutrition Analysis</h1>
+          <button
+            onClick={testNutritionLookup}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+          >
+            Test API
+          </button>
+        </div>
+
+        <div className="grid gap-6">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">Nutrition Overview</h2>
+            {loading ? (
+              <p className="text-gray-500">Loading nutrition data...</p>
+            ) : nutritionFacts.length > 0 ? (
+              <div className="space-y-3">
+                {nutritionFacts.map((fact) => (
+                  <div key={fact.id} className="border border-gray-200 rounded-lg p-4">
+                    <h3 className="font-semibold">{fact.canonical_name}</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 text-sm">
+                      <span>Calories: {fact.calories}</span>
+                      <span>Protein: {fact.protein_g}g</span>
+                      <span>Carbs: {fact.carbohydrate_g}g</span>
+                      <span>Fat: {fact.fat_g}g</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-500 mb-4">No nutrition data yet</p>
+                <p className="text-gray-400 text-sm">Nutrition data will appear when you scan receipts with food items</p>
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">Features</h2>
+            <ul className="space-y-2 text-gray-600">
+              <li>• Automatic nutrition lookup for scanned items</li>
+              <li>• CalorieNinjas API integration</li>
+              <li>• Track protein, carbs, fat, and calories</li>
+              <li>• Nutrition insights and recommendations</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Shopping List Page
+function ShoppingListPage() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Shopping List</h1>
         
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h1 className="text-3xl font-bold mb-6">Analytics & Insights</h1>
-          <p className="text-gray-600 mb-4">Advanced analytics and insights coming soon.</p>
-          <p className="text-gray-600">This will include:</p>
-          <ul className="mt-4 space-y-2 text-gray-600">
-            <li>• Spending trends and patterns</li>
-            <li>• Category breakdown charts</li>
-            <li>• Price comparison insights</li>
-            <li>• Nutrition analysis</li>
-            <li>• Money-saving recommendations</li>
+          <h2 className="text-xl font-semibold mb-4">Smart Shopping Lists</h2>
+          <p className="text-gray-600 mb-4">Coming soon: AI-powered shopping list generation</p>
+          <ul className="space-y-2 text-gray-600">
+            <li>• Generate lists from meal plans</li>
+            <li>• Smart recommendations based on purchase history</li>
+            <li>• Price comparison and deal alerts</li>
+            <li>• Share lists with household members</li>
           </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Meal Plan Page
+function MealPlanPage() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Meal Planning</h1>
+        
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h2 className="text-xl font-semibold mb-4">Weekly Meal Planner</h2>
+          <p className="text-gray-600 mb-4">Coming soon: AI-powered meal planning</p>
+          <ul className="space-y-2 text-gray-600">
+            <li>• Plan meals for the week</li>
+            <li>• Recipe suggestions based on preferences</li>
+            <li>• Automatic shopping list generation</li>
+            <li>• Nutrition balance optimization</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Household Page
+function HouseholdPage() {
+  const navigate = useNavigate();
+  const [household, setHousehold] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadHouseholdData();
+  }, []);
+
+  const loadHouseholdData = async () => {
+    try {
+      const householdData = await emergentAPI.Household.get('c756604e-d3e8-4e6e-918e-12d7d96c877d');
+      setHousehold(householdData);
+    } catch (error) {
+      console.error('Error loading household data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Household Management</h1>
+        
+        <div className="grid gap-6">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">Household Info</h2>
+            {loading ? (
+              <p className="text-gray-500">Loading household data...</p>
+            ) : household ? (
+              <div>
+                <p><strong>Name:</strong> {household.name}</p>
+                <p><strong>ID:</strong> {household.id}</p>
+                <p><strong>Created:</strong> {new Date(household.created_date).toLocaleDateString()}</p>
+              </div>
+            ) : (
+              <p className="text-gray-500">No household data found</p>
+            )}
+          </div>
+
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">Features</h2>
+            <ul className="space-y-2 text-gray-600">
+              <li>• Invite family members to share expenses</li>
+              <li>• Shared receipt scanning and validation</li>
+              <li>• Household budget management</li>
+              <li>• Combined spending analytics</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Settings Page
+function SettingsPage() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Settings</h1>
+        
+        <div className="grid gap-6">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">Account Settings</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  value="test@grocerytrack.app"
+                  disabled
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                <select className="w-full border border-gray-300 rounded-lg px-3 py-2">
+                  <option value="GBP">GBP (£)</option>
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">API Integration Status</h2>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span>AWS Textract</span>
+                <span className="bg-green-100 text-green-800 px-2 py-1 text-xs rounded">✓ Connected</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>OpenAI GPT-4</span>
+                <span className="bg-green-100 text-green-800 px-2 py-1 text-xs rounded">✓ Connected</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>CalorieNinjas</span>
+                <span className="bg-green-100 text-green-800 px-2 py-1 text-xs rounded">✓ Connected</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">Data Management</h2>
+            <div className="space-y-4">
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg w-full">
+                Export All Data
+              </button>
+              <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg w-full">
+                Delete Account
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
