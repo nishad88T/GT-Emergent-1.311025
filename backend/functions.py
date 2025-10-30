@@ -326,8 +326,8 @@ async def process_receipt_in_background(
         # Step 1: Real OCR with AWS Textract
         textract_data = await textract_ocr_real(image_urls)
         
-        # Step 2: LLM Enhancement (still placeholder for OpenAI)
-        enhanced_data = await enhance_receipt_with_llm_placeholder(
+        # Step 2: LLM Enhancement with real OpenAI
+        enhanced_data = await enhance_receipt_with_llm_real(
             textract_data, store_name, total_amount, 'GBP'
         )
         
