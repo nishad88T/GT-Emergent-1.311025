@@ -5,13 +5,6 @@ import './App.css';
 // Import our API client
 import emergentAPI from './api/emergentClient';
 
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import './App.css';
-
-// Import our API client
-import emergentAPI from './api/emergentClient';
-
 // Receipt Detail Modal Component
 function ReceiptDetailModal({ receipt, isOpen, onClose, onUpdate }) {
   if (!receipt || !isOpen) return null;
