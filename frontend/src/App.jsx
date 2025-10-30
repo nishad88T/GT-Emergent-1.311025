@@ -976,6 +976,11 @@ function App() {
           <Route path="/receipts" element={<ReceiptsPage />} />
           <Route path="/budget" element={<BudgetPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/nutrition" element={<NutritionPage />} />
+          <Route path="/shopping-list" element={<ShoppingListPage />} />
+          <Route path="/meal-plan" element={<MealPlanPage />} />
+          <Route path="/household" element={<HouseholdPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </div>
     </Router>
