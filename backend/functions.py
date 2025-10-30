@@ -164,17 +164,18 @@ async def enhance_receipt_with_llm_real(
         
         # Create a prompt for GPT-4 to analyze the receipt data
         prompt = f"""
-        Analyze this receipt from {store_name} with total amount {currency} {total_amount}.
-        
-        OCR Data: {textract_data}
-        
-        Please extract and standardize the items with the following JSON format:
+        You are a grocery receipt analysis expert. Analyze this receipt from {store_name} with total amount {currency} {total_amount}.
+
+        OCR Data: {str(textract_data)}
+
+        Extract and standardize the items. Return ONLY valid JSON in this exact format:
+
         {{
             "items": [
                 {{
-                    "name": "original item name",
-                    "canonical_name": "standardized name",
-                    "category": "category (Vegetables, Fruits, Dairy, Meat & Fish, Grains & Bakery, Snacks, Beverages, Household, Other)",
+                    "name": "original item name from receipt",
+                    "canonical_name": "standardized product name",
+                    "category": "one of: Vegetables, Fruits, Dairy, Meat & Fish, Grains & Bakery, Snacks, Beverages, Household, Other",
                     "quantity": 1,
                     "unit_price": 0.00,
                     "total_price": 0.00,
@@ -187,11 +188,11 @@ async def enhance_receipt_with_llm_real(
             ],
             "receipt_insights": {{
                 "summary": "Brief analysis of this shopping trip",
-                "highlights": ["key insight 1", "key insight 2"]
+                "highlights": ["key insight about spending", "category breakdown", "any deals or savings"]
             }}
         }}
-        
-        Focus on accuracy and proper categorization of grocery items.
+
+        Focus on accuracy. Return only the JSON, no other text.
         """
         
         response = openai.chat.completions.create(
