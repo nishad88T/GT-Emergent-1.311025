@@ -5,6 +5,21 @@ import './App.css';
 // Import our API client
 import emergentAPI from './api/emergentClient';
 
+// Import all page components
+import Dashboard from './pages/Dashboard';
+import ScanReceipt from './pages/ScanReceipt';
+import Receipts from './pages/Receipts';
+import Budget from './pages/Budget';
+import Nutrition from './pages/Nutrition';
+import Analytics from './pages/Analytics';
+import Recipes from './pages/Recipes';
+import MealPlan from './pages/MealPlan';
+import ShoppingList from './pages/ShoppingList';
+import Household from './pages/Household';
+import Settings from './pages/Settings';
+import OperationalInsights from './pages/OperationalInsights';
+import OCRTestingDashboard from './pages/OCRTestingDashboard';
+
 // Simple Working Dashboard
 function Dashboard() {
   const navigate = useNavigate();
