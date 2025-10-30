@@ -25,6 +25,15 @@ export function useUserFeatures() {
     };
 }
 
-// Export all components
+export function useUserContext() {
+    // Return empty user context for now
+    return {
+        user: null,
+        isLoading: false,
+        refetch: () => Promise.resolve()
+    };
+}
+
+// Export all components and hooks
 export { FeatureGuard, FeatureProvider, ScanLimitGuard };
 export default FeatureGuard;
