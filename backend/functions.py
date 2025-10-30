@@ -196,12 +196,12 @@ async def enhance_receipt_with_llm_real(
         """
         
         response = openai.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a grocery receipt analysis expert. Extract and categorize items accurately."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=2000,
+            max_tokens=1500,
             temperature=0.1
         )
         
