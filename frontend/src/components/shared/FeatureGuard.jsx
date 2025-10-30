@@ -6,6 +6,11 @@ function FeatureGuard({ children, requiredFeature, fallback = null }) {
     return children;
 }
 
+function FeatureProvider({ children }) {
+    // Provider for feature context - placeholder implementation
+    return children;
+}
+
 export function useUserFeatures() {
     // Return empty features for now
     return {
@@ -16,5 +21,5 @@ export function useUserFeatures() {
 }
 
 // Export both as default and named export
-export { FeatureGuard };
+export { FeatureGuard, FeatureProvider };
 export default FeatureGuard;
