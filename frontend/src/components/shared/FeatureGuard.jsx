@@ -11,6 +11,11 @@ function FeatureProvider({ children }) {
     return children;
 }
 
+function ScanLimitGuard({ children }) {
+    // Scan limit guard - placeholder implementation
+    return children;
+}
+
 export function useUserFeatures() {
     // Return empty features for now
     return {
@@ -20,6 +25,6 @@ export function useUserFeatures() {
     };
 }
 
-// Export both as default and named export
-export { FeatureGuard, FeatureProvider };
+// Export all components
+export { FeatureGuard, FeatureProvider, ScanLimitGuard };
 export default FeatureGuard;
