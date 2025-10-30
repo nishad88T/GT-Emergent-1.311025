@@ -682,6 +682,7 @@ function Navigation() {
   const navItems = [
     { path: '/', label: 'Dashboard', icon: '🏠' },
     { path: '/scan', label: 'Scan Receipt', icon: '📱' },
+    { path: '/receipts', label: 'Receipts', icon: '📄' },
     { path: '/budget', label: 'Budget', icon: '💰' },
     { path: '/analytics', label: 'Analytics', icon: '📊' }
   ];
@@ -719,6 +720,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/scan" element={<ScanPage />} />
+          <Route path="/receipts" element={<ReceiptsPage />} />
           <Route path="/budget" element={<BudgetPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
         </Routes>
