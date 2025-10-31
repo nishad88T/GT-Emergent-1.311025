@@ -5,7 +5,7 @@ import emergentAPI from '@/api/emergentClient';
 const UserContext = createContext(null);
 
 // User Context Provider
-export function UserProvider({ children }) {
+function UserProvider({ children }) {
     const [user, setUser] = useState(null);
     const [features, setFeatures] = useState({
         hasAdvancedAnalytics: true,
