@@ -122,5 +122,5 @@ function ScanLimitGuard({ children }) {
 }
 
 // Export all components and hooks
-export { FeatureGuard, FeatureProvider, ScanLimitGuard, UserProvider };
+export { FeatureGuard, FeatureProvider, ScanLimitGuard, UserProvider, useUserContext, useUserFeatures };
 export default FeatureGuard;
