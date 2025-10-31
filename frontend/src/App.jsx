@@ -5,6 +5,9 @@ import './App.css';
 // Import our API client
 import emergentAPI from './api/emergentClient';
 
+// Import User Context Provider
+import { UserProvider } from './components/shared/FeatureGuard';
+
 // Import all page components
 import Dashboard from './pages/Dashboard';
 import ScanReceipt from './pages/ScanReceipt';
