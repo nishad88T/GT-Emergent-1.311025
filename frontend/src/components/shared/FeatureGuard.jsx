@@ -60,7 +60,7 @@ function UserProvider({ children }) {
 }
 
 // Hook to use user context
-export function useUserContext() {
+function useUserContext() {
     const context = useContext(UserContext);
     if (!context) {
         // Return defaults if context not available
@@ -82,7 +82,7 @@ export function useUserContext() {
 }
 
 // Hook for features specifically
-export function useUserFeatures() {
+function useUserFeatures() {
     const { features, isLoading } = useUserContext();
     return {
         ...features,
