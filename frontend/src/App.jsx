@@ -77,26 +77,28 @@ function Navigation() {
 // Main App Component
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/scan" element={<ScanReceipt />} />
-          <Route path="/receipts" element={<Receipts />} />
-          <Route path="/budget" element={<Budget />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/nutrition" element={<Nutrition />} />
-          <Route path="/recipes" element={<Recipes />} />
-          <Route path="/meal-plan" element={<MealPlan />} />
-          <Route path="/shopping-list" element={<ShoppingList />} />
-          <Route path="/household" element={<Household />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/operational-insights" element={<OperationalInsights />} />
-          <Route path="/ocr-testing" element={<OCRTestingDashboard />} />
-        </Routes>
-      </div>
-    </Router>
+    <UserProvider>
+      <Router>
+        <div className="min-h-screen bg-gray-50">
+          <Navigation />
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/scan" element={<ScanReceipt />} />
+            <Route path="/receipts" element={<Receipts />} />
+            <Route path="/budget" element={<Budget />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/nutrition" element={<Nutrition />} />
+            <Route path="/recipes" element={<Recipes />} />
+            <Route path="/meal-plan" element={<MealPlan />} />
+            <Route path="/shopping-list" element={<ShoppingList />} />
+            <Route path="/household" element={<Household />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/operational-insights" element={<OperationalInsights />} />
+            <Route path="/ocr-testing" element={<OCRTestingDashboard />} />
+          </Routes>
+        </div>
+      </Router>
+    </UserProvider>
   );
 }
 
